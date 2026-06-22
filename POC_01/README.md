@@ -1,33 +1,49 @@
-# POC 01 — Local/Colab artifact generation
+# POC 01 — Google Drive artifact storage
 
-Minimal experiment for validating deterministic artifact generation before the Hex → GCP → GCS integration.
+This version saves all experiment outputs inside an `output` folder created
+under a user-provided path.
+
+## Google Colab
+
+```python
+from google.colab import drive
+drive.mount("/content/drive")
+```
+
+Then run:
+
+```python
+from experiment import run_experiment
+
+artifacts = run_experiment(
+    output_path="/content/drive/MyDrive/fusion_beta/POC_01",
+    storage_backend="google_drive",
+    n_points=2042,
+    seed=42,
+)
+```
+
+The files will be written to:
+
+```text
+/content/drive/MyDrive/fusion_beta/POC_01/output/
+```
 
 ## Outputs
 
 - `turbulence_series.parquet`
 - `environment.json`
-- Four static PNG charts
-- One interactive Plotly HTML
 - `manifest.json`
+- Four PNG charts
+- `turbulence_dashboard.html`, with four rows and one column
 
-## Run
-
-```bash
-pip install -r requirements.txt
-python experiment.py
-```
-
-Or open `poc_01_colab.ipynb` in Google Colab.
-
-The main interface is:
+## Local test
 
 ```python
-run_experiment(
-    n_points=2042,
-    seed=42,
-    output_uri="outputs",
+artifacts = run_experiment(
+    output_path=".",
     storage_backend="local",
 )
 ```
 
-`save_artifacts` is used as the standard persistence function name. In this POC, only the local backend is implemented. A GCS backend can later be added without changing the experiment interface.
+This creates `./output`.
