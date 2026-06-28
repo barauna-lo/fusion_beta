@@ -1,0 +1,5 @@
+colorednoise==2.2.0
+numpy
+pandas
+plotly
+snowflake-snowpark-python

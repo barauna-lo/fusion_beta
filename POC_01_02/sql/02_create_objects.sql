@@ -1,0 +1,56 @@
+USE ROLE FUSION_POC_ROLE;
+USE WAREHOUSE FUSION_POC_WH;
+USE DATABASE FUSION_POC_DB;
+USE SCHEMA POC_01_02;
+
+CREATE TABLE IF NOT EXISTS POC_01_02_TURBULENCE_SERIES (
+    RUN_ID STRING,
+    STEP NUMBER,
+    BETA_0 FLOAT,
+    BETA_1 FLOAT,
+    BETA_5_3 FLOAT,
+    BETA_2 FLOAT
+);
+
+CREATE TABLE IF NOT EXISTS POC_01_02_ENVIRONMENT (
+    RUN_ID STRING,
+    METADATA_JSON VARIANT,
+    CREATED_AT TIMESTAMP_TZ
+);
+
+CREATE TABLE IF NOT EXISTS POC_01_02_ARTIFACT_MANIFEST (
+    RUN_ID STRING,
+    ARTIFACT_NAME STRING,
+    ARTIFACT_TYPE STRING,
+    STORAGE_BACKEND STRING,
+    STORAGE_REFERENCE STRING,
+    CONTENT_TEXT STRING,
+    CREATED_AT TIMESTAMP_TZ
+);
+
+CREATE OR REPLACE PROCEDURE POC_01_02_RUN_EXPERIMENT(
+    RUN_ID STRING,
+    N_POINTS INTEGER,
+    SEED INTEGER
+)
+RETURNS STRING
+LANGUAGE PYTHON
+RUNTIME_VERSION = '3.11'
+HANDLER = 'snowflake_runner.main'
+ARTIFACT_REPOSITORY = snowflake.snowpark.pypi_shared_repository
+PACKAGES = (
+    'snowflake-snowpark-python',
+    'pandas',
+    'numpy',
+    'plotly',
+    'colorednoise==2.2.0'
+)
+IMPORTS = (
+    '@FUSION_BETA_REPO/branches/main/POC_01_02/src/experiment.py',
+    '@FUSION_BETA_REPO/branches/main/POC_01_02/src/savefile.py',
+    '@FUSION_BETA_REPO/branches/main/POC_01_02/src/snowflake_runner.py'
+)
+AS
+$$
+# Handler code is imported from the Git repository clone.
+$$;
